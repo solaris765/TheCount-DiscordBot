@@ -1,0 +1,41 @@
+# on push to main branch build and create new release with zipped dist folder
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 18
+      - run: npm install
+      - run: npm run build
+      - run: zip -r dist.zip dist
+      - uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: dist.zip
+
+# create new tag with git sha and upload dist.zip as release asset
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: dist
+          path: dist
+      - uses: ncipollo/release-action@v1
+        id: create_release
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: ${{ github.sha }}
+          artifacts: dist/dist.zip
+          tag: ${{ github.sha }}
