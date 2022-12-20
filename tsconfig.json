@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
     "outDir": "./dist/",
-    "downlevelIteration": false
+    "target": "ES2022",
+    "moduleResolution": "node",
+    "module": "es2020"
   }
   ,"include": ["./src/**/*"]
 }
