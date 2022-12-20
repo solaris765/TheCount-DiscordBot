@@ -3,7 +3,7 @@
     "outDir": "./dist/",
     "target": "ES2022",
     "moduleResolution": "node",
-    "module": "es2020"
+    "module": "commonjs",
   }
   ,"include": ["./src/**/*"]
 }

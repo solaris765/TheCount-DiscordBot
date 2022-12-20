@@ -16,7 +16,7 @@ jobs:
           node-version: 18
       - run: npm install
       - run: npm run build
-      - run: zip -r dist.zip dist
+      - run: zip -r dist.zip dist node_modules package.json package-lock.json
       - uses: actions/upload-artifact@v2
         with:
           name: dist
