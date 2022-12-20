@@ -22,7 +22,7 @@ jobs:
           name: dist
           path: dist.zip
 
-# create new tag with git sha and upload dist.zip as release asset
+# create new tag with git short_sha and upload dist.zip as release asset
   release:
     needs: build
     runs-on: ubuntu-latest
@@ -31,11 +31,23 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: dist
-          path: dist
-      - uses: ncipollo/release-action@v1
-        id: create_release
+      - name: Get git short SHA
+        id: vars
+        run: echo "::set-output name=sha_short::$(git rev-parse --short=7 ${{ github.sha }})"
+      - run: unzip dist.zip
+      - uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          name: ${{ github.sha }}
-          artifacts: dist/dist.zip
-          tag: ${{ github.sha }}
+          tag_name: ${{ steps.vars.outputs.sha_short }}
+          release_name: Release ${{ steps.vars.outputs.sha_short }}
+          draft: false
+          prerelease: false
+      - uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist.zip
+          asset_name: dist.zip
+          asset_content_type: application/zip
